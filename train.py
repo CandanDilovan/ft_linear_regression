@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def trainer(path: str) -> list:
+def main(path: str) -> list:
     try:
         df = ft_load(path)
         line = {
@@ -27,9 +27,10 @@ def trainer(path: str) -> list:
         plt.gca().invert_yaxis()
         plt.scatter(df["km"], df["price"])
         plt.show()
+        file = open("trained_data.csv", 'w')
+        file.write(f"{line["xy1"][1]}, {line["slope"]}")
     except (KeyboardInterrupt, AssertionError) as msg:
         print(msg)
-    return [line['xy1'][1], line['slope']]
 
 
 def denorm(pd: pd.DataFrame, line: dict) -> dict:
@@ -47,6 +48,7 @@ def learning_test(df: pd.DataFrame, line: dict):
     for x in range(10000):
         ssr = sum_squared_residuals(df, line)
         adaptative_rate = learn_rate / (1 + 0.1 * x)
+        print(adaptative_rate)
         if ((abs(ssr["intercept"] * adaptative_rate) < 0.001)
            and abs(ssr["slope"] * adaptative_rate) < 0.001):
             break
@@ -54,21 +56,6 @@ def learning_test(df: pd.DataFrame, line: dict):
             line['xy1'][1] += ssr["intercept"] * adaptative_rate
         if abs(ssr["slope"] * adaptative_rate) > 0.001:
             line['slope'] += (ssr["slope"] * adaptative_rate)
-
-
-def predict_y(km: float, line: dict) -> float:
-    """_summary_
-
-    Args:
-        km (float): mileage of the car
-        line (dict): coordinate of the line
-
-    Returns:
-        float: return the predicted price
-    """
-    y_itercept = line["xy1"][1] - (line['slope'] * line["xy1"][0])
-    point = (line['slope'] * km) + y_itercept
-    return point
 
 
 def derivative(price: float, intercept: float, slope: float,
@@ -118,3 +105,7 @@ def sum_squared_residuals(df: pd.DataFrame, line: dict):
         ssr["slope"] += (slope(line['norm_price'][x], y_itercept,
                                line['slope'], line['norm_km'][x]))
     return ssr
+
+
+if __name__ == "__main__":
+    main("data.csv")

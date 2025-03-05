@@ -1,25 +1,24 @@
-from test import trainer
+from ft_load_csv import ft_load
 
 
 def main():
-    theta = [0, 0]
-    while True:
-        if theta[0] == 0 and theta[1] == 0:
-            print("type TRAIN to train a model with a given dataset")
-            debut = input()
-            if debut == 'TRAIN':
-                theta = trainer('data.csv')
-            else:
-                print('The price of the car is 0')
+    try:
+        theta = ft_load("trained_data.csv")
+        if theta is None:
+            theta = [0, 0]
         else:
+            theta = theta.columns.tolist()
+        while True:
             print("enter the mileage of the car")
             km = input()
-            print(type(km))
-            if not km.isnumeric():
-                print('please enter a round number')
+            if not km.isnumeric() or int(km) < 0:
+                print('please enter a round positive number')
             else:
                 km = int(km)
                 print(f'The price of the car is {predict_y(km, theta)}')
+                break
+    except (KeyboardInterrupt, AssertionError, InterruptedError) as msg:
+        print(msg)
 
 
 def predict_y(km: float, theta: list) -> float:
@@ -32,7 +31,7 @@ def predict_y(km: float, theta: list) -> float:
     Returns:
         float: return the predicted price
     """
-    return (theta[1] * km) + theta[0]
+    return (float(theta[1]) * km) + float(theta[0])
 
 
 if __name__ == "__main__":
